@@ -6,7 +6,7 @@ import file_run_commands as fr
 TITLE = 'net-tools'
 MAINWINDOWSIZE = "900x700"
 
-LARGE_FONT = ("Verdana", 12)
+LARGE_FONT = ("Verdana", 22)
 NORM_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 
@@ -29,7 +29,7 @@ class NetTools(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(FilePage)
+        self.show_frame(HomePage)
 
     def show_frame(self, page):
         frame = self.frames[page]
@@ -45,23 +45,32 @@ class HomePage(tk.Frame):
         self.grid_rowconfigure(1,weight=1)
         self.grid_columnconfigure(1,weight=1)
 
+        self.grid_rowconfigure(2,weight=1)
+        self.grid_rowconfigure(3,weight=1)
+        self.grid_rowconfigure(4,weight=1)
+        self.grid_rowconfigure(5,weight=1)
+        self.grid_rowconfigure(6,weight=1)
+
         pullFrom = tk.StringVar(value="not selected")
 
         button1 = ttk.Button(self, text="> Next >",
                             command=lambda: controller.show_frame(FilePage))
-        button1.grid(row=1,column=1,sticky="se",padx=10,pady=10)
+        button1.grid(row=7,column=1,sticky="se",padx=10,pady=10)
 
         pullFromLabel = ttk.Label(self, text="Collect devices from:",font=LARGE_FONT)
         pullFromLabel.grid(row=0,column=0,columnspan=2)
 
-        apicRadio = ttk.Radiobutton(text="APIC-EM",variable=pullFrom,value="apic-em")
-        apicRadio.grid(row=1,column=0)
+        pullFromFrame = tk.Frame(self)
+        pullFromFrame.grid(row=2,column=0,sticky="ne")
 
-        fileRadio = ttk.Radiobutton(text="Device File (.yml)",variable=pullFrom,value="file")
-        apicRadio.grid(row=2,column=0)
+        apicRadio = tk.Radiobutton(pullFromFrame,text="APIC-EM",variable=pullFrom,value="apic-em")
+        apicRadio.grid(sticky="w")
 
-        manualRadio = ttk.Radiobutton(text="Manual",variable=pullFrom,value="manual")
-        apicRadio.grid(row=3,column=0)
+        fileRadio = tk.Radiobutton(pullFromFrame,text="Device File (.yml)",variable=pullFrom,value="file")
+        fileRadio.grid(sticky="w")
+
+        manualRadio = tk.Radiobutton(pullFromFrame,text="Manual",variable=pullFrom,value="manual")
+        manualRadio.grid(sticky="w")
         
 class TestPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -72,7 +81,7 @@ class TestPage(tk.Frame):
         self.grid_rowconfigure(1,weight=1)
         self.grid_columnconfigure(1,weight=1)
 
-        tlFrame = tk.Frame(self, background="red",)
+        tlFrame = tk.Frame(self, background="red")
         tlFrame.grid(row=0,column=0, sticky="nsew")
 
         trFrame = tk.Frame(self, background="blue")
