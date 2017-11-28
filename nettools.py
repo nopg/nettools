@@ -7,6 +7,7 @@ from tkinter import scrolledtext as tkst
 
 import file_run_commands as frc
 import apic_run_commands as arc
+import test
 
 TITLE = 'net-tools'
 MAINWINDOWSIZE = "900x700"
@@ -442,46 +443,56 @@ class CommandPage(tk.Frame):
     def start_gather(self):
 
         self.controller.commands = self.commandText.get('1.0', 'end').splitlines()
-        self.outputWindow = PopupWindow(self.parent, self.controller)
+
+        #self.testrun = test.PopupWindow(self.parent, self.controller)
+        #self.controller.wait_window(self,testrun.top)
+
+        #self.outputWindow = PopupWindow(self.parent, self.controller)
         #self.controller.wait_window(self.outputWindow.top)
 
-class PopupWindow(object):
-    def __init__(self,parent, controller):
-        top=self.top=tk.Toplevel(parent)
+        x = 1
+        while x < 1000000:
+            self.commandText.insert(tk.END, x)
+            self.commandText.insert(tk.END, "\n")
+            x += 1
 
-        self.controller = controller
-        #top.grid_rowconfigure(0, weight=1)
-        #top.grid_rowconfigure(1, weight=3)
-        #top.grid_columnconfigure(0, weight=1)
-
-        outputLabel = ttk.Label(top, text="Output: ")
-        outputLabel.grid(row=0)
-        outputBox = tkst.ScrolledText(top, width=60, height=30, borderwidth=2, relief=tk.SUNKEN)
-        outputBox.insert(tk.END, "Testing")
-        outputBox.grid(row=1, padx=10)
-
-        if self.controller.pageFrom == "ApicPage":
-            arc.apic_run_commands(self.controller.apicIP,
-                                 self.controller.apicUser,
-                                 self.controller.apicPass,
-                                 self.controller.apicTag,
-                                 self.controller.deviceUser,
-                                 self.controller.devicePass,
-                                 self.controller.outputPath,
-                                 self.controller.commands)
-
-        elif self.controller.pageFrom == "FilePage":
-            frc.run_commands(self.controller.deviceList,
-                            self.controller.outputPath,
-                            self.controller.deviceUser,
-                            self.controller.devicePass,
-                            self.controller.commands,
-                            outputBox)
-
-        elif self.controller.pageFrom == "ManualPage":
-            messagebox.showinfo(TITLE, "I told you this was under construction!")
-        else:#
-            pas
+#class PopupWindow(object):
+#    def __init__(self,parent, controller):
+#        top=self.top=tk.Toplevel(parent)
+#
+#        self.controller = controller
+#        #top.grid_rowconfigure(0, weight=1)
+#        #top.grid_rowconfigure(1, weight=3)
+#        #top.grid_columnconfigure(0, weight=1)
+#
+#        outputLabel = ttk.Label(top, text="Output: ")
+#        outputLabel.grid(row=0)
+#        outputBox = tkst.ScrolledText(top, width=60, height=30, borderwidth=2, relief=tk.SUNKEN)
+#        outputBox.insert(tk.END, "Testing")
+#        outputBox.grid(row=1, padx=10)
+#
+#        if self.controller.pageFrom == "ApicPage":
+#            arc.apic_run_commands(self.controller.apicIP,
+#                                 self.controller.apicUser,
+#                                 self.controller.apicPass,
+#                                 self.controller.apicTag,
+#                                 self.controller.deviceUser,
+#                                 self.controller.devicePass,
+#                                 self.controller.outputPath,
+#                                 self.controller.commands)
+#
+#        elif self.controller.pageFrom == "FilePage":
+#            frc.run_commands(self.controller.deviceList,
+#                            self.controller.outputPath,
+#                            self.controller.deviceUser,
+#                            self.controller.devicePass,
+#                            self.controller.commands,
+#                            outputBox)
+#
+#        elif self.controller.pageFrom == "ManualPage":
+#            messagebox.showinfo(TITLE, "I told you this was under construction!")
+#        else:#
+#            pass
 
 if __name__ == "__main__":
     app = NetTools(None)

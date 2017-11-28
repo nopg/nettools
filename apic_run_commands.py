@@ -36,7 +36,7 @@ def newAPICallGET(url):
         print("Unable to authenticate with APIC-EM, please check username/password settings.\n")
         sys.exit(0)
     except KeyboardInterrupt:
-        print("User interupted connection, closing program.\n")
+        print("User interrupted connection, closing program.\n")
         sys.exit(0)    
     except Exception:
         print("Unable to connect to APIC-EM, please check network connectivity and try again.\n")
