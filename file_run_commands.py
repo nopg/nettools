@@ -1,9 +1,10 @@
-from datetime import datetime
 import sys
 import yaml
+import tkinter as tk
+from datetime import datetime
+
 from netmiko import ConnectHandler
 from netmiko.ssh_exception import *
-import tkinter as tk
 
 def ly(filename):
     with open(filename) as _:

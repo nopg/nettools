@@ -481,7 +481,8 @@ class PopupWindow(object):
                                  self.controller.deviceUser,
                                  self.controller.devicePass,
                                  self.controller.outputPath,
-                                 self.controller.commands)
+                                 self.controller.commands,
+                                 outputBox, parent)
 
         elif self.controller.pageFrom == "FilePage":
             frc.run_commands(self.controller.deviceList,
