@@ -34,7 +34,6 @@ class NetTools(tk.Tk):
         self.commands = ""
         self.deviceList = ""
 
-
         self.initialize()
 
     def initialize(self):
@@ -458,7 +457,8 @@ class PopupWindow(object):
         top.grid_columnconfigure(0, weight=1)
 
         outputLabel = ttk.Label(top, text="Output: ")
-        outputBox = tkst.ScrolledText(top, width=80, height=30, borderwidth=2, relief=tk.SUNKEN)
+        self.outputBox = tkst.ScrolledText(top, width=80, height=30, borderwidth=2, relief=tk.SUNKEN)
+        self.outputBox.bind_class("Text", "<Button-2>", func=self.nothing)
 
         buttonFrame = tk.Frame(top)
 
@@ -467,7 +467,7 @@ class PopupWindow(object):
         cancelLabel = ttk.Label(buttonFrame, text="Use CTRL+C from command line to cancel.", font=SMALL_FONT)
 
         outputLabel.grid(row=0)
-        outputBox.grid(row=1, padx=10)
+        self.outputBox.grid(row=1, padx=10)
 
         buttonFrame.grid(row=2)
         doneButton.grid(row=0, pady=10)
@@ -482,7 +482,7 @@ class PopupWindow(object):
                                  self.controller.devicePass,
                                  self.controller.outputPath,
                                  self.controller.commands,
-                                 outputBox, parent)
+                                 self.outputBox, parent)
 
         elif self.controller.pageFrom == "FilePage":
             frc.run_commands(self.controller.deviceList,
@@ -490,7 +490,7 @@ class PopupWindow(object):
                             self.controller.deviceUser,
                             self.controller.devicePass,
                             self.controller.commands,
-                            outputBox, parent)
+                            self.outputBox, parent)
 
         elif self.controller.pageFrom == "ManualPage":
             messagebox.showinfo(TITLE, "I told you this was under construction!")
@@ -500,6 +500,8 @@ class PopupWindow(object):
         doneButton.config(text="Close")
         doneButton.config(state="normal")
 
+    def nothing(self, pos):
+        self.outputBox.selection_clear()
     def done(self):
         self.top.destroy()
 
