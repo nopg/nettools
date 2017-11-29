@@ -61,7 +61,7 @@ class NetTools(tk.Tk):
 
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self,parent)#, background="blue")
+        tk.Frame.__init__(self,parent)
 
         self.controller = controller
         self.grid_rowconfigure(0,weight=1)
@@ -78,7 +78,7 @@ class HomePage(tk.Frame):
 
         self.pullFrom = tk.StringVar(value="not selected")
 
-        pullFromLabel = tk.Label(self, text="Collect devices from:",font=LARGE_FONT, background="white")
+        pullFromLabel = ttk.Label(self, text="Collect devices from:",font=LARGE_FONT, background="white")
         pullFromLabel.grid(row=0,column=0,columnspan=2)
 
         pullFromFrame = tk.Frame(self,relief=tk.SUNKEN)#,borderwidth=1)
@@ -123,7 +123,7 @@ class HomePage(tk.Frame):
 class FilePage(tk.Frame):
 
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, background="green")
+        tk.Frame.__init__(self, parent)
         self.controller = controller
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -386,7 +386,7 @@ class ApicPage(tk.Frame):
 
 class ManualPage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, background="grey")
+        tk.Frame.__init__(self, parent)
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -408,7 +408,7 @@ class ManualPage(tk.Frame):
 
 class CommandPage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, background="purple")
+        tk.Frame.__init__(self, parent)
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=3)
