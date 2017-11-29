@@ -78,7 +78,7 @@ class HomePage(tk.Frame):
 
         self.pullFrom = tk.StringVar(value="not selected")
 
-        pullFromLabel = ttk.Label(self, text="Collect devices from:",font=LARGE_FONT, background="white")
+        pullFromLabel = ttk.Label(self, text="Collect devices from:",font=LARGE_FONT)
         pullFromLabel.grid(row=0,column=0,columnspan=2)
 
         pullFromFrame = tk.Frame(self,relief=tk.SUNKEN)#,borderwidth=1)
