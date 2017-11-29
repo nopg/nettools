@@ -459,8 +459,6 @@ class PopupWindow(object):
 
         outputLabel = ttk.Label(top, text="Output: ")
         outputBox = tkst.ScrolledText(top, width=80, height=30, borderwidth=2, relief=tk.SUNKEN)
-        ounputBox.config(state="disabled")
-
 
         buttonFrame = tk.Frame(top)
 
