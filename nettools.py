@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 from tkinter import ttk
 
@@ -60,7 +61,7 @@ class NetTools(tk.Tk):
 
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self,parent, background="blue")
+        tk.Frame.__init__(self,parent)#, background="blue")
 
         self.controller = controller
         self.grid_rowconfigure(0,weight=1)
@@ -77,7 +78,7 @@ class HomePage(tk.Frame):
 
         self.pullFrom = tk.StringVar(value="not selected")
 
-        pullFromLabel = ttk.Label(self, text="Collect devices from:",font=LARGE_FONT)
+        pullFromLabel = tk.Label(self, text="Collect devices from:",font=LARGE_FONT, background="white")
         pullFromLabel.grid(row=0,column=0,columnspan=2)
 
         pullFromFrame = tk.Frame(self,relief=tk.SUNKEN)#,borderwidth=1)
@@ -452,14 +453,26 @@ class PopupWindow(object):
         top=self.top=tk.Toplevel(parent)
 
         self.controller = controller
-        #top.grid_rowconfigure(0, weight=1)
-        #top.grid_rowconfigure(1, weight=3)
-        #top.grid_columnconfigure(0, weight=1)
+        self.parent = parent
+        top.grid_rowconfigure(1, weight=1)
+        top.grid_columnconfigure(0, weight=1)
 
         outputLabel = ttk.Label(top, text="Output: ")
-        outputLabel.grid(row=0)
         outputBox = tkst.ScrolledText(top, width=80, height=30, borderwidth=2, relief=tk.SUNKEN)
+
+
+        buttonFrame = tk.Frame(top)
+
+        doneButton = ttk.Button(buttonFrame, text="Running...", command=self.done)
+        doneButton.config(state="disabled")
+        cancelLabel = ttk.Label(buttonFrame, text="Use CTRL+C from command line to cancel.", font=SMALL_FONT)
+
+        outputLabel.grid(row=0)
         outputBox.grid(row=1, padx=10)
+
+        buttonFrame.grid(row=2)
+        doneButton.grid(row=0, pady=10)
+        cancelLabel.grid(row=0,column = 1, padx=50, sticky="e")
 
         if self.controller.pageFrom == "ApicPage":
             arc.apic_run_commands(self.controller.apicIP,
@@ -483,6 +496,13 @@ class PopupWindow(object):
             messagebox.showinfo(TITLE, "I told you this was under construction!")
         else:#
             pass
+
+        doneButton.config(text="Close")
+        doneButton.config(state="normal")
+
+    def done(self):
+        self.top.destroy()
+
 
 if __name__ == "__main__":
     app = NetTools(None)
