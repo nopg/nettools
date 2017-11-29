@@ -12,7 +12,7 @@ import apic_run_commands as arc
 TITLE = 'net-tools'
 MAINWINDOWSIZE = "900x700"
 
-LARGE_FONT = ("Verdana", 20)
+LARGE_FONT = ("Verdana", 18)
 NORM_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 
