@@ -331,8 +331,8 @@ class ApicPage(tk.Frame):
 
         if self.outputToFolder.get():
             self.outputPathLabel.grid(row=1, column=0, sticky="W", pady=10)
-            self.outputPathText.grid(row=2, column=0, sticky="W", padx=10,pady=5)
-            self.directoryButton.grid(row=2, sticky="E")
+            self.outputPathText.grid(row=2, column=0, sticky="W", padx=(10,0), pady=5)
+            self.directoryButton.grid(row=2, column=1, sticky="E", padx=10)
         else:
             self.outputPathLabel.grid_remove()
             self.outputPathText.grid_remove()
