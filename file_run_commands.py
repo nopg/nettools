@@ -7,8 +7,12 @@ from netmiko import ConnectHandler
 from netmiko.ssh_exception import *
 
 def ly(filename):
-    with open(filename) as _:
-        return yaml.load(_)
+    try:
+        with open(filename) as _:
+            return yaml.load(_)
+    except:
+        print("Invalid device file!")
+        sys.exit(0)
 
 def run_commands(fin,configpath,username,password,COMMANDS,outputBox,root):
     start_time = datetime.now()

@@ -10,7 +10,7 @@ import file_run_commands as frc
 import apic_run_commands as arc
 
 TITLE = 'net-tools'
-MAINWINDOWSIZE = "700x600"
+MAINWINDOWSIZE = "700x550"
 
 LARGE_FONT = ("Verdana", 18)
 NORM_FONT = ("Verdana", 10)
@@ -131,7 +131,7 @@ class FilePage(tk.Frame):
         self.outputToFolder = tk.BooleanVar()
 
         devicelistFrame = tk.Frame(self)#, background="yellow")
-        devicelistFrame.grid(row=1,sticky="nsew", padx=10 ,pady=10)
+        devicelistFrame.grid(row=0,sticky="nsew", padx=10 ,pady=10)
 
         deviceListLabel = ttk.Label(devicelistFrame, text="Choose device list file (.yml): ", font=LARGE_FONT)
         self.deviceListBox = tk.Text(devicelistFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
@@ -140,7 +140,7 @@ class FilePage(tk.Frame):
 
 
         credentialsFrame = tk.Frame(self)#, background="red")
-        credentialsFrame.grid(row=2,sticky="nsew", padx=10, pady=10)
+        credentialsFrame.grid(row=1,sticky="nsew", padx=10, pady=10)
         credentialsLabel = ttk.Label(credentialsFrame, text="Network Device Credentials: ", font=LARGE_FONT)
         credentialsUserLabel = ttk.Label(credentialsFrame, text="Username: ", font=NORM_FONT)
         self.credentialsUserBox = ttk.Entry(credentialsFrame, width=35)
@@ -235,25 +235,16 @@ class FilePage(tk.Frame):
 
 class ApicPage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)#, background="yellow")
         self.controller = controller
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
-        self.grid_rowconfigure(3, weight=1)
-        self.grid_rowconfigure(4, weight=1)
-        self.grid_rowconfigure(5, weight=1)
-        self.grid_rowconfigure(6, weight=1)
-        self.grid_rowconfigure(7, weight=1)
-        self.grid_rowconfigure(8, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
         self.showpassApic = tk.BooleanVar()
         self.showpass = tk.BooleanVar()
         self.outputToFolder = tk.BooleanVar()
 
-        apicFrame = tk.Frame(self)
-        apicFrame.grid(row=1, sticky="W", padx=10, pady=10)
+        apicFrame = tk.Frame(self)#, background="blue")
         apicLabel = ttk.Label(apicFrame, text="APIC-EM Credentials:", font=LARGE_FONT)
         apicIPLabel = ttk.Label(apicFrame, text="IP Address")
         self.apicIPEntry = ttk.Entry(apicFrame, width=15)
@@ -271,8 +262,8 @@ class ApicPage(tk.Frame):
         self.apicTagEntry = ttk.Entry(apicFrame, width=35)
         self.apicTagEntry.bind("<Tab>", self.controller.focus_next_box)
 
-
-        apicLabel.grid(row=0)
+        apicFrame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        apicLabel.grid(row=0, column=0)
         apicIPLabel.grid(row=1, pady=5)
         self.apicIPEntry.grid(row=1, column=1, sticky="W")
         apicShowPass.grid(row=1, column=1, sticky="E")
@@ -283,8 +274,7 @@ class ApicPage(tk.Frame):
         apicTagLabel.grid(row=4, pady=20)
         self.apicTagEntry.grid(row=4, column=1)
 
-        credentialsFrame = tk.Frame(self)
-        credentialsFrame.grid(row=2, sticky="W", padx=10, pady=10)
+        credentialsFrame = tk.Frame(self)#, background="green")
         credentialsLabel = ttk.Label(credentialsFrame, text="Network Device Credentials: ", font=LARGE_FONT)
         credentialsUserLabel = ttk.Label(credentialsFrame, text="Username: ", font=NORM_FONT)
         self.credentialsUserBox = ttk.Entry(credentialsFrame, width=35)
@@ -294,8 +284,18 @@ class ApicPage(tk.Frame):
         self.credentialsPassBox.bind("<Tab>", controller.focus_next_box)
         credentialsShowPass = ttk.Checkbutton(credentialsFrame, text="Show Password", variable=self.showpass,
                                               command=self.show_password)
-        outputToFolderFrame = tk.Frame(self)
-        outputToFolderFrame.grid(row=3, sticky="W", padx=10, pady=10)
+
+        credentialsFrame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        credentialsLabel.grid(row=0, column=0, columnspan=2, sticky="W")
+        credentialsUserLabel.grid(row=1, column=0, sticky="W", pady=5)
+        self.credentialsUserBox.grid(row=1, column=1, sticky="W", padx=10, pady=5)
+        credentialsPassLabel.grid(row=2, column=0, sticky="W", pady=5)
+        self.credentialsPassBox.grid(row=2, column=1, sticky="W", padx=10, pady=5)
+        credentialsShowPass.grid(row=2, column=2)
+
+        
+        outputToFolderFrame = tk.Frame(self)#, background="red")
+
         outputToFolderOption = ttk.Checkbutton(outputToFolderFrame, text="Log output to files?",
                                                variable=self.outputToFolder,
                                                command=self.outputToFolderCheck)
@@ -305,13 +305,10 @@ class ApicPage(tk.Frame):
                                       border=1)
         self.outputPathText.bind("<Tab>", self.controller.focus_next_box)
         self.directoryButton = tk.Button(outputToFolderFrame, text="...", command=self.pickFolder)
-        credentialsLabel.grid(row=1, sticky="W")
-        credentialsUserLabel.grid(row=2, sticky="W", pady=5)
-        self.credentialsUserBox.grid(row=3, sticky="W", padx=10, pady=5)
-        credentialsPassLabel.grid(row=4, sticky="W", pady=5)
-        self.credentialsPassBox.grid(row=5, sticky="W", padx=10, pady=5)
-        credentialsShowPass.grid(row=5, column=1)
-        outputToFolderOption.grid(row=0, sticky="W")
+
+
+        outputToFolderFrame.grid(row=2, column=0, sticky="nW", padx=10, pady=10)        
+        outputToFolderOption.grid(row=0, column=0, sticky="W")
 
         # NEXT / BACK BUTTONS
         backButton = ttk.Button(self, text="< Back <", command=self.backPage)
@@ -333,8 +330,8 @@ class ApicPage(tk.Frame):
     def outputToFolderCheck(self):
 
         if self.outputToFolder.get():
-            self.outputPathLabel.grid(row=1, sticky="W", pady=10)
-            self.outputPathText.grid(row=2, sticky="W", padx=10,pady=5)
+            self.outputPathLabel.grid(row=1, column=0, sticky="W", pady=10)
+            self.outputPathText.grid(row=2, column=0, sticky="W", padx=10,pady=5)
             self.directoryButton.grid(row=2, sticky="E")
         else:
             self.outputPathLabel.grid_remove()
@@ -424,10 +421,13 @@ class CommandPage(tk.Frame):
 
     def backPage(self):
         if self.controller.pageFrom == "ApicPage":
+            self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(ApicPage)
         elif self.controller.pageFrom == "FilePage":
+            self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(FilePage)
         elif self.controller.pageFrom == "ManualPage":
+            self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(ManualPage)
         return
 
