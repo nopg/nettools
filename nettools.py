@@ -122,24 +122,16 @@ class HomePage(tk.Frame):
 class FilePage(tk.Frame):
 
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent)#, background="green")
         self.controller = controller
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1,weight=1)
-        self.grid_rowconfigure(2,weight=1)
-        self.grid_rowconfigure(3,weight=1)
-        self.grid_rowconfigure(4,weight=1)
-        self.grid_rowconfigure(5,weight=1)
-        self.grid_rowconfigure(6,weight=1)
-        self.grid_rowconfigure(7,weight=1)
-        self.grid_rowconfigure(8,weight=1)
 
         self.showpass = tk.BooleanVar()
         self.outputToFolder = tk.BooleanVar()
 
-        devicelistFrame = tk.Frame(self)
-        devicelistFrame.grid(row=1,sticky="W", padx=10 ,pady=10)
+        devicelistFrame = tk.Frame(self)#, background="yellow")
+        devicelistFrame.grid(row=1,sticky="nsew", padx=10 ,pady=10)
 
         deviceListLabel = ttk.Label(devicelistFrame, text="Choose device list file (.yml): ", font=LARGE_FONT)
         self.deviceListBox = tk.Text(devicelistFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
@@ -147,8 +139,8 @@ class FilePage(tk.Frame):
         deviceListButton = tk.Button(devicelistFrame, text="...", command=self.pickFile)
 
 
-        credentialsFrame = tk.Frame(self)
-        credentialsFrame.grid(row=2,sticky="W", padx=10, pady=10)
+        credentialsFrame = tk.Frame(self)#, background="red")
+        credentialsFrame.grid(row=2,sticky="nsew", padx=10, pady=10)
         credentialsLabel = ttk.Label(credentialsFrame, text="Network Device Credentials: ", font=LARGE_FONT)
         credentialsUserLabel = ttk.Label(credentialsFrame, text="Username: ", font=NORM_FONT)
         self.credentialsUserBox = ttk.Entry(credentialsFrame, width=35)
@@ -159,8 +151,11 @@ class FilePage(tk.Frame):
         credentialsShowPass = ttk.Checkbutton(credentialsFrame,text="Show Password", variable=self.showpass,
                                                  command=self.show_password)
 
-        outputToFolderFrame = tk.Frame(self)
-        outputToFolderFrame.grid(row=3,sticky="W", padx=10, pady=10)
+        #credentialsFrame.grid_rowconfigure(6, weight=1)
+        #credentialsFrame.grid_columnconfigure(0, weight=1)
+
+        outputToFolderFrame = tk.Frame(credentialsFrame)#, background="blue")
+        outputToFolderFrame.grid(row=6,sticky="nW", padx=10, pady=10, columnspan=2)
         outputToFolderOption = ttk.Checkbutton(outputToFolderFrame, text="Log output to files?", variable=self.outputToFolder,
                                                command=self.outputToFolderCheck)
         self.outputPathLabel = ttk.Label(outputToFolderFrame, text="Choose output log destination folder: ", font=LARGE_FONT)
@@ -199,8 +194,8 @@ class FilePage(tk.Frame):
 
         if self.outputToFolder.get():
             self.outputPathLabel.grid(row=1, sticky="W", pady=10)
-            self.outputPathText.grid(row=2, sticky="W", padx=10,pady=5)
-            self.directoryButton.grid(row=2, sticky="E")
+            self.outputPathText.grid(row=2, sticky="W", padx=(10,0),pady=5)
+            self.directoryButton.grid(row=2, column = 1, sticky="E", padx=10)
         else:
             self.outputPathLabel.grid_remove()
             self.outputPathText.grid_remove()
