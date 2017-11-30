@@ -124,7 +124,7 @@ class FilePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)#, background="green")
         self.controller = controller
-        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         self.showpass = tk.BooleanVar()
@@ -151,11 +151,8 @@ class FilePage(tk.Frame):
         credentialsShowPass = ttk.Checkbutton(credentialsFrame,text="Show Password", variable=self.showpass,
                                                  command=self.show_password)
 
-        #credentialsFrame.grid_rowconfigure(6, weight=1)
-        #credentialsFrame.grid_columnconfigure(0, weight=1)
-
-        outputToFolderFrame = tk.Frame(credentialsFrame)#, background="blue")
-        outputToFolderFrame.grid(row=6,sticky="nW", padx=10, pady=10, columnspan=2)
+        outputToFolderFrame = tk.Frame(self)#, background="blue")
+        outputToFolderFrame.grid(row=3,sticky="nW", padx=10, pady=10, columnspan=2)
         outputToFolderOption = ttk.Checkbutton(outputToFolderFrame, text="Log output to files?", variable=self.outputToFolder,
                                                command=self.outputToFolderCheck)
         self.outputPathLabel = ttk.Label(outputToFolderFrame, text="Choose output log destination folder: ", font=LARGE_FONT)
