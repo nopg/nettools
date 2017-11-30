@@ -10,7 +10,7 @@ import file_run_commands as frc
 import apic_run_commands as arc
 
 TITLE = 'net-tools'
-MAINWINDOWSIZE = "900x700"
+MAINWINDOWSIZE = "700x600"
 
 LARGE_FONT = ("Verdana", 18)
 NORM_FONT = ("Verdana", 10)
