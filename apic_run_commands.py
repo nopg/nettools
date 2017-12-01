@@ -12,7 +12,7 @@ requests.packages.urllib3.disable_warnings()
 
 ## MAIN ##
 
-def apic_run_commands(apicem_ip,apicuser,apicpass,searchtag,username,password,outputpath,commands,outputBox,root):
+def apic_run_commands(apicem_ip,apicuser,apicpass,searchtag,username,password,outputpath,commands,outputBox=None,root=None):
 
     ###################################
     ## INTERNAL FUNCTION DEFINITIONS ##
@@ -57,61 +57,65 @@ def apic_run_commands(apicem_ip,apicuser,apicpass,searchtag,username,password,ou
     ## RUN COMMANDS ON NETWORK DEVICES
     def run_commands(my_list):
         for device in my_list:
-            ## Open output file ##
-            with open(OUTPUTPATH + '/' + device['hostname'] + '.txt', 'w') as fout:
 
-                connect_dict = {'device_type': 'cisco_ios', 'ip': device['ip'], 'username': USERNAME,
-                                'password': PASSWORD}
+            connect_dict = {'device_type': 'cisco_ios', 'ip': device['ip'], 'username': USERNAME,
+                            'password': PASSWORD}
 
-                print(f"Connecting to {device['ip']}.....", end='', flush=True)
-                outputBox.insert(tk.END, f"Connecting to {device['ip']}.....")
-                root.update()
+            present_output("\nConnecting to {}.....\n".format(device['ip']))
+
+            try:
+                net_connect = ConnectHandler(**connect_dict)
+            except NetMikoTimeoutException:
+                present_output("Unable to connect to host {} ({}) (timeout!".format(device['hostname'], device['ip']))
+                continue
+            except NetMikoAuthenticationException:
+                present_output("Unable to connect to host {} ({}) (authentication failure)!".format(device['hostname'],
+                                                                                                    device['ip']))
+                continue
+            except ConnectionRefusedError:
+                present_output("Unable to connect to host {} ({}) (connection refused)!".format(device['hostname'],
+                                                                                                device['ip']))
+                continue
+            except KeyboardInterrupt:
+                print("User interupted connection, closing program.\n")
+                sys.exit(0)
+            except Exception:
+                present_output("Unknown error connecting to host {} ({})".format(device['hostname'],
+                                                                                 device['ip']))
+                continue
+
+            present_output("Success!")
+
+            if outputpath == '':
+                if device_type == "cisco_nxos":
+                    pass
+                else:
+                    for command in COMMANDS:
+                        present_output("\n\nRunning Command: {}\n".format(command))
+                        fout.write("\n\nRunning Command:\n" + command + "\n\n")
+
+                        output = net_connect.send_command(command)
+                        present_output(output)
+            else:
                 try:
-                    net_connect = ConnectHandler(**connect_dict)
-                except NetMikoTimeoutException:
-                    error = f"Unable to connect to host {device['hostname']} ({device['ip']}) (timeout)!"
-                    print(error)
-                    fout.write(error)
-                    outputBox.insert(tk.END, error)
-                    root.update()
-                    continue
-                except NetMikoAuthenticationException:
-                    error = f"Unable to connect to host {device['hostname']} ({device['ip']}) (authentication failure)!"
-                    print(error)
-                    fout.write(error)
-                    outputBox.insert(tk.END, error)
-                    root.update()
-                    continue
-                except ConnectionRefusedError:
-                    error = f"Unable to connect to host {device['hostname']} ({device['ip']}) (connection refused)!"
-                    print(error)
-                    fout.write(error)
-                    outputBox.insert(tk.END, error)
-                    root.update()
-                    continue
-                except KeyboardInterrupt:
-                    print("User interupted connection, closing program.\n")
-                    sys.exit(0)
-                except Exception:
-                    error = f"Unknown error connecting to host {device['hostname']} {device['ip']}"
-                    print(error)
-                    fout.write(error)
-                    outputBox.insert(tk.END, error)
-                    root.update()
+                    ## Open output file ##
+                    with open(OUTPUTPATH + '/' + device['hostname'] + '.txt', 'w') as fout:
+                        if device_type == "cisco_nxos":
+                            pass
+                        else:
+                            for command in COMMANDS:
+                                present_output("\n\nRunning Command: {}\n".format(command))
+                                fout.write("\n\nRunning Command:\n" + command + "\n\n")
 
-                print("Success!", flush=True)
-                outputBox.insert(tk.END, "Success!")
-                root.update()
+                                output = net_connect.send_command(command)
+                                fout.write(output)
+                                present_output(output)
+                except:
+                    present_output("\nInvalid destination folder!\nContinuing....")
 
-                for command in COMMANDS:
-                    print("Running Command: {}\n".format(command), flush=True)
-                    fout.write("\n\nRunning Command:\n" + command + "\n\n")
-                    outputBox.insert(tk.END, "\n\nRunning Command:\n")
-                    root.update()
-                    output = net_connect.send_command(command)
-                    fout.write(output)
-                    outputBox.insert(tk.END, output)
-                    root.update()
+                    output = net_connect.send_config_set(COMMANDS)
+
+                    present_output(output)
 
     ## GRAB ALL DEVICES WITH TAG ##
     def grabdevicestag(my_list):
@@ -135,6 +139,14 @@ def apic_run_commands(apicem_ip,apicuser,apicpass,searchtag,username,password,ou
 
         run_commands(ip_list)
 
+    def present_output(msg):
+        if not outputBox or not root:
+            print(msg, end='', flush=True)
+        else:
+            outputBox.insert(tk.END, msg)
+            root.update()
+            print(msg, end='', flush=True)
+
     ###################
     ## MAIN FUNCTION ##
     ###################
@@ -149,9 +161,7 @@ def apic_run_commands(apicem_ip,apicuser,apicpass,searchtag,username,password,ou
     COMMANDS = commands
 
     start_time = datetime.now()
-    print("\n\n\nThank you! Gathering Output..\n\n\n")
-    outputBox.insert(tk.END,"\n\n\nThank you! Gathering Output..\n\n\n")
-    root.update()
+    present_output("\n\n\nThank you! Gathering Output..\n\n\n")
 
     if SEARCHTAG == '':             # GRAB ALL DEVICES
         data = newAPICallGET('network-device')
@@ -162,7 +172,5 @@ def apic_run_commands(apicem_ip,apicuser,apicpass,searchtag,username,password,ou
         tag_device_list = data['response']
         grabdevicestag(tag_device_list)
 
-    print("\nTime elapsed: {}".format(datetime.now() - start_time))
-    print("Complete.")
-    outputBox.insert(tk.END, "\n\n\nComplete! Check command prompt for stats.")
-    root.update()
+    present_output("\nTime elapsed: {}".format(datetime.now() - start_time))
+    present_output("\nComplete.\n\n\nComplete!")
