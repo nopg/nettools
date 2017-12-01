@@ -368,6 +368,7 @@ class ApicPage(tk.Frame):
         if self.outputToFolder.get():
             if self.controller.outputPath == "":
                 messagebox.showinfo(TITLE, "A folder must be chosen if 'log output' is checked!")
+            else: self.controller.show_frame(CommandPage)
         else:
             self.controller.show_frame(CommandPage)
 
