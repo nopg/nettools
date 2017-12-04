@@ -81,12 +81,8 @@ def run_commands(fin,configpath,username,password,COMMANDS,outputBox=None,root=N
                 present_output("\nUnknown error connecting to device: {}\n".format(ip))
                 continue
 
-            output = net_connect.send_command("show run | inc hostname")
-            if not output:
-                filename = net_connect.send_command("show hostname").strip()
-            else:
-                filename = output[9:]
-
+            filename = net_connect.find_prompt().rstrip('#')
+            
             filename = filename + '..' + \
             str(datetime.now().year) + '-' + \
             str(datetime.now().month) + '-' + \
@@ -96,7 +92,7 @@ def run_commands(fin,configpath,username,password,COMMANDS,outputBox=None,root=N
             str(datetime.now().second) + '.log'
             
             successes.append( (ip , filename + ".log") )
-            present_output("Success!\nOutput")
+            present_output("Success!\nOutput:")
             
             if configpath == '':
                 if device_type == "cisco_nxos":
