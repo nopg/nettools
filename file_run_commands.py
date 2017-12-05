@@ -28,6 +28,7 @@ def run_commands(fin,configpath,username,password,COMMANDS,outputBox=None,root=N
             print(msg, end='', flush=True)
         else:
             outputBox.insert(tk.END, msg)
+            outputBox.see(tk.END)
             root.update()
             print(msg, end='', flush=True)
 

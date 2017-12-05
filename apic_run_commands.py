@@ -144,6 +144,7 @@ def apic_run_commands(apicem_ip,apicuser,apicpass,searchtag,username,password,ou
             print(msg, end='', flush=True)
         else:
             outputBox.insert(tk.END, msg)
+            outputBox.see(tk.END)
             root.update()
             print(msg, end='', flush=True)
 
