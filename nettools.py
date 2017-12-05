@@ -42,7 +42,7 @@ class NetTools(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (HomePage, ApicPage, FilePage, ManualPage, CommandPage):
+        for F in (HomePage, ApicPage, FilePage, ManualPage, CommandPage, APPortsPage):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -94,6 +94,10 @@ class HomePage(tk.Frame):
                                      command=self.pullFromChecked)
         manualRadio.grid(sticky="w")
 
+        apportsRadio = tk.Radiobutton(pullFromFrame,text="AP-Ports",variable=self.pullFrom,value="apports",
+                                     command=self.pullFromChecked)
+        apportsRadio.grid(sticky="w")
+
         # NEXT / BACK BUTTONs
 
         nextButton = ttk.Button(self, text="> Next >",command=self.nextPage)
@@ -115,6 +119,9 @@ class HomePage(tk.Frame):
         elif self.pullFromVar == "manual":
             self.controller.pageFrom = "ManualPage"
             self.controller.show_frame(ManualPage)
+        elif self.pullFromVar == "apports":
+            self.controller.pageFrom = "APPortsPage"
+            self.controller.show_frame(APPortsPage)
         else:
             messagebox.showinfo(TITLE,"Please choose an option!")
 
@@ -429,6 +436,9 @@ class CommandPage(tk.Frame):
         elif self.controller.pageFrom == "ManualPage":
             self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(ManualPage)
+        elif self.controller.pageFrom == "APPortsPage":
+            self.commandText.delete(0.0, tk.END)
+            self.controller.show_frame(APPortsPage)
         return
 
     def start_gather(self):
@@ -486,6 +496,8 @@ class PopupWindow(object):
 
         elif self.controller.pageFrom == "ManualPage":
             messagebox.showinfo(TITLE, "I told you this was under construction!")
+        elif self.controller.pageFrom == "APPortsPage":
+            messagebox.showinfo(TITLE, "This feature is under construction!")
         else:#
             pass
 
@@ -496,6 +508,120 @@ class PopupWindow(object):
         self.outputBox.selection_clear()
     def done(self):
         self.top.destroy()
+
+class APPortsPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)#, background="green")
+        self.controller = controller
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.showpass = tk.BooleanVar()
+        self.outputToFolder = tk.BooleanVar()
+
+        devicelistFrame = tk.Frame(self)#, background="yellow")
+        devicelistFrame.grid(row=0,sticky="nsew", padx=10 ,pady=10)
+
+        deviceListLabel = ttk.Label(devicelistFrame, text="Choose device list file (.yml): ", font=LARGE_FONT)
+        self.deviceListBox = tk.Text(devicelistFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
+        self.deviceListBox.bind("<Tab>", controller.focus_next_box)
+        deviceListButton = tk.Button(devicelistFrame, text="...", command=self.pickFile)
+
+
+        credentialsFrame = tk.Frame(self)#, background="red")
+        credentialsFrame.grid(row=1,sticky="nsew", padx=10, pady=10)
+        credentialsLabel = ttk.Label(credentialsFrame, text="Network Device Credentials: ", font=LARGE_FONT)
+        credentialsUserLabel = ttk.Label(credentialsFrame, text="Username: ", font=NORM_FONT)
+        self.credentialsUserBox = ttk.Entry(credentialsFrame, width=35)
+        self.credentialsUserBox.bind("<Tab>",controller.focus_next_box)
+        credentialsPassLabel = ttk.Label(credentialsFrame, text="Password: ", font=NORM_FONT)
+        self.credentialsPassBox = ttk.Entry(credentialsFrame, width=35,show="*")
+        self.credentialsPassBox.bind("<Tab>", controller.focus_next_box)
+        credentialsShowPass = ttk.Checkbutton(credentialsFrame,text="Show Password", variable=self.showpass,
+                                                 command=self.show_password)
+
+        outputToFolderFrame = tk.Frame(self)#, background="blue")
+        outputToFolderFrame.grid(row=3,sticky="nW", padx=10, pady=10, columnspan=2)
+        outputToFolderOption = ttk.Checkbutton(outputToFolderFrame, text="Log output to files?", variable=self.outputToFolder,
+                                               command=self.outputToFolderCheck)
+        self.outputPathLabel = ttk.Label(outputToFolderFrame, text="Choose output log destination folder: ", font=LARGE_FONT)
+        self.outputPathText = tk.Text(outputToFolderFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
+        self.outputPathText.bind("<Tab>", self.controller.focus_next_box)
+        self.directoryButton = tk.Button(outputToFolderFrame, text="...", command=self.pickFolder)
+
+        deviceListLabel.grid(row=1, sticky="W")
+        self.deviceListBox.grid(row=2, sticky="W", padx=10,pady=5)
+        deviceListButton.grid(row=2,column=1)
+
+        credentialsLabel.grid(row=1, sticky="W")
+        credentialsUserLabel.grid(row=2, sticky="W", pady=5)
+        self.credentialsUserBox.grid(row=3, sticky="W", padx=10,pady=5)
+        credentialsPassLabel.grid(row=4, sticky="W", pady=5)
+        self.credentialsPassBox.grid(row=5, sticky="W", padx=10,pady=5)
+        credentialsShowPass.grid(row=5,column=1)
+
+        outputToFolderOption.grid(row=0, sticky="W")
+
+        # NEXT / BACK BUTTONS
+
+        backButton = ttk.Button(self, text="< Back <", command=self.backPage)
+        backButton.grid(row=20,column=1,sticky="se",padx=10,pady=10)
+
+        nextButton = ttk.Button(self, text="> Next >", command=self.nextPage)
+        nextButton.grid(row=20,column=2,sticky="se",padx=10,pady=10)
+
+    def show_password(self):
+        if self.showpass.get():
+            self.credentialsPassBox.config(show="")
+        else:
+            self.credentialsPassBox.config(show="*")
+
+    def outputToFolderCheck(self):
+
+        if self.outputToFolder.get():
+            self.outputPathLabel.grid(row=1, sticky="W", pady=10)
+            self.outputPathText.grid(row=2, sticky="W", padx=(10,0),pady=5)
+            self.directoryButton.grid(row=2, column = 1, sticky="E", padx=10)
+        else:
+            self.outputPathLabel.grid_remove()
+            self.outputPathText.grid_remove()
+            self.directoryButton.grid_remove()
+            self.outputPathText.delete(0.0, tk.END)
+
+    def pickFile(self):
+        self.deviceListBox.delete(0.0, tk.END)
+        devicelist = filedialog.askopenfilename()
+        self.deviceListBox.insert(0.0, devicelist)
+
+    def pickFolder(self):
+        self.outputPathText.delete(0.0, tk.END)
+        outputPath = filedialog.askdirectory()
+        self.outputPathText.insert(0.0, outputPath)
+
+
+    def backPage(self):
+        self.deviceListBox.delete(0.0, tk.END)
+        self.credentialsUserBox.delete(0, 'end')
+        self.credentialsPassBox.delete(0, 'end')
+        self.outputPathText.delete(0.0, tk.END)
+        self.controller.show_frame(HomePage)
+
+    def nextPage(self):
+        self.controller.deviceUser = self.credentialsUserBox.get()
+        self.controller.devicePass = self.credentialsPassBox.get()
+        self.controller.deviceList = self.deviceListBox.get('1.0', 'end').strip()
+        self.controller.outputPath = self.outputPathText.get('1.0', 'end').strip()
+
+        if self.controller.deviceList == "":
+            messagebox.showinfo(TITLE, "Please select a device list file!")
+        elif self.outputToFolder.get():
+            if self.controller.outputPath == "":
+                messagebox.showinfo(TITLE, "A folder must be chosen if 'log output' is checked!")
+            else:
+                self.controller.show_frame(CommandPage)
+        else:
+            self.controller.show_frame(CommandPage)
 
 
 if __name__ == "__main__":
