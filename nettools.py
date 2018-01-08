@@ -7,9 +7,10 @@ from tkinter import scrolledtext as tkst
 
 import file_run_commands as frc
 import apic_run_commands as arc
+import ap_ports as ap
 
 TITLE = 'net-tools'
-MAINWINDOWSIZE = "850x550"
+MAINWINDOWSIZE = "850x700"
 
 LARGE_FONT = ("Verdana", 18)
 NORM_FONT = ("Verdana", 10)
@@ -32,6 +33,7 @@ class NetTools(tk.Tk):
         self.outputPath = ""
         self.commands = ""
         self.deviceList = ""
+        self.searchString = ""
 
         self.initialize()
 
@@ -383,23 +385,296 @@ class ManualPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        self.controller = controller
+        self.parent = parent
+        self.showpass = tk.BooleanVar()
+        self.outputToFolder = tk.BooleanVar()
 
-        tempMessage = ttk.Label(self,text="This page is currently under construction.")
-        tempMessage.grid()
+        testFrame = tk.Frame(self)
+
+        iosLabel = ttk.Label(testFrame, text="IOS Devices:")
+        self.iosText = tkst.ScrolledText(testFrame, width=40, height=10, borderwidth=2, relief=tk.SUNKEN)
+
+        nxosLabel = ttk.Label(testFrame, text="NX-OS Devices:")
+        self.nxosText = tkst.ScrolledText(testFrame, width=40, height=10, borderwidth=2, relief=tk.SUNKEN)
+
+        asaLabel = ttk.Label(testFrame, text="ASA Devices:")
+        self.asaText = tkst.ScrolledText(testFrame, width=40, height=10, borderwidth=2, relief=tk.SUNKEN)
+
+        telnetLabel = ttk.Label(testFrame, text="Telnet Devices:")
+        self.telnetText = tkst.ScrolledText(testFrame, width=40, height=10, borderwidth=2, relief=tk.SUNKEN)
+
+        testFrame.grid(row=0,column=0)
+
+        iosLabel.grid(row=0,column=0,padx=10)
+        self.iosText.grid(row=1, column=0, padx=10)
+
+        nxosLabel.grid(row=2, column=0, padx=10)
+        self.nxosText.grid(row=3, column=0, padx=10)
+
+        asaLabel.grid(row=0, column=1, padx=10)
+        self.asaText.grid(row=1, column=1, padx=10)
+
+        telnetLabel.grid(row=2, column=1, padx=10)
+        self.telnetText.grid(row=3, column=1, padx=10)
+
+        credentialsFrame = tk.Frame(self)
+
+        credentialsLabel = ttk.Label(credentialsFrame, text="Network Device Credentials: ", font=LARGE_FONT)
+        credentialsUserLabel = ttk.Label(credentialsFrame, text="Username: ", font=NORM_FONT)
+        self.credentialsUserBox = ttk.Entry(credentialsFrame, width=35)
+        self.credentialsUserBox.bind("<Tab>", controller.focus_next_box)
+        credentialsPassLabel = ttk.Label(credentialsFrame, text="Password: ", font=NORM_FONT)
+        self.credentialsPassBox = ttk.Entry(credentialsFrame, width=35, show="*")
+        self.credentialsPassBox.bind("<Tab>", controller.focus_next_box)
+        credentialsShowPass = ttk.Checkbutton(credentialsFrame, text="Show Password", variable=self.showpass,
+                                              command=self.show_password)
+
+        credentialsFrame.grid(row=1, column=0, padx=10, pady=10)
+
+        credentialsLabel.grid(row=0, column=0, columnspan=2, sticky="W")
+        credentialsUserLabel.grid(row=1, column=0, sticky="W", pady=5)
+        self.credentialsUserBox.grid(row=1, column=1, sticky="W", padx=10, pady=5)
+        credentialsPassLabel.grid(row=2, column=0, sticky="W", pady=5)
+        self.credentialsPassBox.grid(row=2, column=1, sticky="W", padx=10, pady=5)
+        credentialsShowPass.grid(row=2, column=2)
+
+        outputToFolderFrame = tk.Frame(self)  # , background="red")
+
+        outputToFolderOption = ttk.Checkbutton(outputToFolderFrame, text="Log output to files?",
+                                               variable=self.outputToFolder,
+                                               command=self.outputToFolderCheck)
+        self.outputPathLabel = ttk.Label(outputToFolderFrame, text="Choose output log destination folder: ",
+                                         font=LARGE_FONT)
+        self.outputPathText = tk.Text(outputToFolderFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN,
+                                      border=1)
+        self.outputPathText.bind("<Tab>", self.controller.focus_next_box)
+        self.directoryButton = tk.Button(outputToFolderFrame, text="...", command=self.pickFolder)
+
+        outputToFolderFrame.grid(row=2, column=0, padx=10, pady=10, sticky="nw")
+        outputToFolderOption.grid(row=0, column=0, sticky="W")
 
         # NEXT / BACK BUTTONS
 
-        backButton = ttk.Button(self, text="< Back <",
-                            command=lambda: controller.show_frame(HomePage))
+        backButton = ttk.Button(self, text="< Back <", command=self.backPage)
         backButton.grid(row=20,column=1,sticky="se",padx=10,pady=10)
 
-        nextButton = ttk.Button(self, text="> Next >",
-                            command=lambda: controller.show_frame(CommandPage))
+        nextButton = ttk.Button(self, text="> Next >", command=self.nextPage)
         nextButton.grid(row=20,column=2,sticky="se",padx=10,pady=10)
 
+
+    def show_password(self):
+        if self.showpass.get():
+            self.credentialsPassBox.config(show="")
+        else:
+            self.credentialsPassBox.config(show="*")
+
+    def outputToFolderCheck(self):
+
+        if self.outputToFolder.get():
+            self.outputPathLabel.grid(row=1, sticky="W", pady=10)
+            self.outputPathText.grid(row=2, sticky="W", padx=(10,0),pady=5)
+            self.directoryButton.grid(row=2, column = 1, sticky="E", padx=10)
+        else:
+            self.outputPathLabel.grid_remove()
+            self.outputPathText.grid_remove()
+            self.directoryButton.grid_remove()
+            self.outputPathText.delete(0.0, tk.END)
+
+    def pickFile(self):
+        self.deviceListBox.delete(0.0, tk.END)
+        devicelist = filedialog.askopenfilename()
+        self.deviceListBox.insert(0.0, devicelist)
+
+    def pickFolder(self):
+        self.outputPathText.delete(0.0, tk.END)
+        outputPath = filedialog.askdirectory()
+        self.outputPathText.insert(0.0, outputPath)
+
+    def backPage(self):
+        self.iosText.delete(0.0, tk.END)
+        self.nxosText.delete(0.0, tk.END)
+        self.asaText.delete(0.0, tk.END)
+        self.telnetText.delete(0.0, tk.END)
+        self.credentialsUserBox.delete(0, 'end')
+        self.credentialsPassBox.delete(0, 'end')
+        self.outputPathText.delete(0.0, tk.END)
+        self.controller.show_frame(HomePage)
+
+    def nextPage(self):
+        self.controller.deviceUser = self.credentialsUserBox.get()
+        self.controller.devicePass = self.credentialsPassBox.get()
+        self.controller.outputPath = self.outputPathText.get('1.0', 'end').strip()
+
+        iosDevices = self.iosText.get('1.0', 'end').splitlines()
+        nxosDevices = self.nxosText.get('1.0', 'end').splitlines()
+        asaDevices = self.asaText.get('1.0', 'end').splitlines()
+        telnetDevices = self.telnetText.get('1.0', 'end').splitlines()
+
+    ### CREATE TEMP DEVICE FILE FROM MANUAL ENTRIES ###
+        with open('./.~tempdevices.yml', 'w') as self.controller.tempDeviceFile:
+            self.controller.tempDeviceFile.write("---\n")
+            if iosDevices != ['']:
+                self.controller.tempDeviceFile.write("IOS:\n")
+                for device in iosDevices:
+                    self.controller.tempDeviceFile.write(" - " + device + '\n')
+            if nxosDevices != ['']:
+                self.controller.tempDeviceFile.write("NX-OS:\n")
+                for device in nxosDevices:
+                    self.controller.tempDeviceFile.write(" - " + device + '\n')
+            if asaDevices != ['']:
+                self.controller.tempDeviceFile.write("ASA:\n")
+                for device in asaDevices:
+                    self.controller.tempDeviceFile.write(" - " + device + '\n')
+            if telnetDevices != ['']:
+                self.controller.tempDeviceFile.write("TELNET:\n")
+                for device in telnetDevices:
+                    self.controller.tempDeviceFile.write(" - " + device + '\n')
+
+        if (iosDevices == [''] and
+           nxosDevices == [''] and
+           asaDevices == [''] and
+           telnetDevices == ['']):
+            messagebox.showinfo(TITLE, "Please enter at least one device!")
+        elif self.outputToFolder.get():
+            if self.controller.outputPath == "":
+                messagebox.showinfo(TITLE, "A folder must be chosen if 'log output' is checked!")
+            else:
+                self.controller.show_frame(CommandPage)
+        else:
+            self.controller.show_frame(CommandPage)
+
+class APPortsPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)#, background="green")
+        self.controller = controller
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.parent = parent
+        self.controller = controller
+        self.showpass = tk.BooleanVar()
+        self.outputToFolder = tk.BooleanVar()
+
+        devicelistFrame = tk.Frame(self)#, background="yellow")
+        devicelistFrame.grid(row=0,sticky="nsew", padx=10 ,pady=10)
+
+        deviceListLabel = ttk.Label(devicelistFrame, text="Choose device list file (.yml): ", font=LARGE_FONT)
+        self.deviceListBox = tk.Text(devicelistFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
+        self.deviceListBox.bind("<Tab>", controller.focus_next_box)
+        deviceListButton = tk.Button(devicelistFrame, text="...", command=self.pickFile)
+
+
+        credentialsFrame = tk.Frame(self)#, background="red")
+        credentialsFrame.grid(row=1,sticky="nsew", padx=10, pady=10)
+        credentialsLabel = ttk.Label(credentialsFrame, text="Network Device Credentials: ", font=LARGE_FONT)
+        credentialsUserLabel = ttk.Label(credentialsFrame, text="Username: ", font=NORM_FONT)
+        self.credentialsUserBox = ttk.Entry(credentialsFrame, width=35)
+        self.credentialsUserBox.bind("<Tab>",controller.focus_next_box)
+        credentialsPassLabel = ttk.Label(credentialsFrame, text="Password: ", font=NORM_FONT)
+        self.credentialsPassBox = ttk.Entry(credentialsFrame, width=35,show="*")
+        self.credentialsPassBox.bind("<Tab>", controller.focus_next_box)
+        credentialsShowPass = ttk.Checkbutton(credentialsFrame,text="Show Password", variable=self.showpass,
+                                                 command=self.show_password)
+
+        searchStringLabel = ttk.Label(credentialsFrame, text="Model/String to search for via CDP\n(use AIR- for Access Points):",
+                                                    font=LARGE_FONT)
+        self.searchStringText = ttk.Entry(credentialsFrame, width=35)
+
+        outputToFolderFrame = tk.Frame(self)#, background="blue")
+        outputToFolderFrame.grid(row=3,sticky="nW", padx=10, pady=10, columnspan=2)
+        outputToFolderOption = ttk.Checkbutton(outputToFolderFrame, text="Log output to files?", variable=self.outputToFolder,
+                                               command=self.outputToFolderCheck)
+        self.outputPathLabel = ttk.Label(outputToFolderFrame, text="Choose output log destination folder: ", font=LARGE_FONT)
+        self.outputPathText = tk.Text(outputToFolderFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
+        self.outputPathText.bind("<Tab>", self.controller.focus_next_box)
+        self.directoryButton = tk.Button(outputToFolderFrame, text="...", command=self.pickFolder)
+
+        deviceListLabel.grid(row=1, sticky="W")
+        self.deviceListBox.grid(row=2, sticky="W", padx=10,pady=5)
+        deviceListButton.grid(row=2,column=1)
+
+        credentialsLabel.grid(row=1, sticky="W")
+        credentialsUserLabel.grid(row=2, sticky="W", pady=5)
+        self.credentialsUserBox.grid(row=3, sticky="W", padx=10,pady=5)
+        credentialsPassLabel.grid(row=4, sticky="W", pady=5)
+        self.credentialsPassBox.grid(row=5, sticky="W", padx=10,pady=5)
+        credentialsShowPass.grid(row=5,column=1)
+
+        searchStringLabel.grid(row=6,column=0, pady=20)
+        self.searchStringText.grid(row=7,column=0)
+        outputToFolderOption.grid(row=0, sticky="W")
+
+        # NEXT / BACK BUTTONS
+
+        backButton = ttk.Button(self, text="< Back <", command=self.backPage)
+        backButton.grid(row=20,column=1,sticky="se",padx=10,pady=10)
+
+        nextButton = ttk.Button(self, text="> Next >", command=self.nextPage)
+        nextButton.grid(row=20,column=2,sticky="se",padx=10,pady=10)
+
+    def show_password(self):
+        if self.showpass.get():
+            self.credentialsPassBox.config(show="")
+        else:
+            self.credentialsPassBox.config(show="*")
+
+    def outputToFolderCheck(self):
+
+        if self.outputToFolder.get():
+            self.outputPathLabel.grid(row=1, sticky="W", pady=10)
+            self.outputPathText.grid(row=2, sticky="W", padx=(10,0),pady=5)
+            self.directoryButton.grid(row=2, column = 1, sticky="E", padx=10)
+        else:
+            self.outputPathLabel.grid_remove()
+            self.outputPathText.grid_remove()
+            self.directoryButton.grid_remove()
+            self.outputPathText.delete(0.0, tk.END)
+
+    def pickFile(self):
+        self.deviceListBox.delete(0.0, tk.END)
+        devicelist = filedialog.askopenfilename()
+        self.deviceListBox.insert(0.0, devicelist)
+
+    def pickFolder(self):
+        self.outputPathText.delete(0.0, tk.END)
+        outputPath = filedialog.askdirectory()
+        self.outputPathText.insert(0.0, outputPath)
+
+
+    def backPage(self):
+        self.deviceListBox.delete(0.0, tk.END)
+        self.credentialsUserBox.delete(0, 'end')
+        self.credentialsPassBox.delete(0, 'end')
+        self.outputPathText.delete(0.0, tk.END)
+        self.searchStringText.delete(0, 'end')
+        self.controller.show_frame(HomePage)
+
+
+    def nextPage(self):
+        self.controller.deviceUser = self.credentialsUserBox.get()
+        self.controller.devicePass = self.credentialsPassBox.get()
+        self.controller.deviceList = self.deviceListBox.get('1.0', 'end').strip()
+        self.controller.outputPath = self.outputPathText.get('1.0', 'end').strip()
+        self.controller.searchString = self.searchStringText.get()
+
+        if self.controller.deviceList == "":
+            messagebox.showinfo(TITLE, "Please select a device list file!")
+        elif self.outputToFolder.get():
+            if self.controller.outputPath == "":
+                messagebox.showinfo(TITLE, "A folder must be chosen if 'log output' is checked!")
+            else:
+                self.apPortsRun()
+        else:
+            self.apPortsRun()
+
+    def apPortsRun(self):
+        self.outputWindow = PopupWindow(self.parent, self.controller)
+        self.controller.wait_window(self.outputWindow.top)
 
 class CommandPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -427,17 +702,16 @@ class CommandPage(tk.Frame):
         backButton.grid(row=20,column=1,sticky="se",padx=10,pady=10)
 
     def backPage(self):
+
+        self.commandText.delete(0.0, tk.END)
+
         if self.controller.pageFrom == "ApicPage":
-            self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(ApicPage)
         elif self.controller.pageFrom == "FilePage":
-            self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(FilePage)
         elif self.controller.pageFrom == "ManualPage":
-            self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(ManualPage)
         elif self.controller.pageFrom == "APPortsPage":
-            self.commandText.delete(0.0, tk.END)
             self.controller.show_frame(APPortsPage)
         return
 
@@ -495,9 +769,20 @@ class PopupWindow(object):
                             self.outputBox, parent)
 
         elif self.controller.pageFrom == "ManualPage":
-            messagebox.showinfo(TITLE, "I told you this was under construction!")
+            frc.run_commands(self.controller.tempDeviceFile.name,
+                            self.controller.outputPath,
+                            self.controller.deviceUser,
+                            self.controller.devicePass,
+                            self.controller.commands,
+                            self.outputBox, parent)
+
         elif self.controller.pageFrom == "APPortsPage":
-            messagebox.showinfo(TITLE, "This feature is under construction!")
+            messagebox.showinfo(TITLE, "This feature is under construction\nPlease check the CLI for output.\n"
+                                       "IOS devices supported only.")
+            ap.run_commands(self.controller.deviceUser,
+                            self.controller.devicePass,
+                            self.controller.deviceList,
+                            self.controller.searchString)
         else:#
             pass
 
@@ -508,121 +793,6 @@ class PopupWindow(object):
         self.outputBox.selection_clear()
     def done(self):
         self.top.destroy()
-
-class APPortsPage(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)#, background="green")
-        self.controller = controller
-        self.grid_rowconfigure(3, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-
-        self.showpass = tk.BooleanVar()
-        self.outputToFolder = tk.BooleanVar()
-
-        devicelistFrame = tk.Frame(self)#, background="yellow")
-        devicelistFrame.grid(row=0,sticky="nsew", padx=10 ,pady=10)
-
-        deviceListLabel = ttk.Label(devicelistFrame, text="Choose device list file (.yml): ", font=LARGE_FONT)
-        self.deviceListBox = tk.Text(devicelistFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
-        self.deviceListBox.bind("<Tab>", controller.focus_next_box)
-        deviceListButton = tk.Button(devicelistFrame, text="...", command=self.pickFile)
-
-
-        credentialsFrame = tk.Frame(self)#, background="red")
-        credentialsFrame.grid(row=1,sticky="nsew", padx=10, pady=10)
-        credentialsLabel = ttk.Label(credentialsFrame, text="Network Device Credentials: ", font=LARGE_FONT)
-        credentialsUserLabel = ttk.Label(credentialsFrame, text="Username: ", font=NORM_FONT)
-        self.credentialsUserBox = ttk.Entry(credentialsFrame, width=35)
-        self.credentialsUserBox.bind("<Tab>",controller.focus_next_box)
-        credentialsPassLabel = ttk.Label(credentialsFrame, text="Password: ", font=NORM_FONT)
-        self.credentialsPassBox = ttk.Entry(credentialsFrame, width=35,show="*")
-        self.credentialsPassBox.bind("<Tab>", controller.focus_next_box)
-        credentialsShowPass = ttk.Checkbutton(credentialsFrame,text="Show Password", variable=self.showpass,
-                                                 command=self.show_password)
-
-        outputToFolderFrame = tk.Frame(self)#, background="blue")
-        outputToFolderFrame.grid(row=3,sticky="nW", padx=10, pady=10, columnspan=2)
-        outputToFolderOption = ttk.Checkbutton(outputToFolderFrame, text="Log output to files?", variable=self.outputToFolder,
-                                               command=self.outputToFolderCheck)
-        self.outputPathLabel = ttk.Label(outputToFolderFrame, text="Choose output log destination folder: ", font=LARGE_FONT)
-        self.outputPathText = tk.Text(outputToFolderFrame, width=45, height=2, wrap=tk.WORD, relief=tk.SUNKEN, border=1)
-        self.outputPathText.bind("<Tab>", self.controller.focus_next_box)
-        self.directoryButton = tk.Button(outputToFolderFrame, text="...", command=self.pickFolder)
-
-        deviceListLabel.grid(row=1, sticky="W")
-        self.deviceListBox.grid(row=2, sticky="W", padx=10,pady=5)
-        deviceListButton.grid(row=2,column=1)
-
-        credentialsLabel.grid(row=1, sticky="W")
-        credentialsUserLabel.grid(row=2, sticky="W", pady=5)
-        self.credentialsUserBox.grid(row=3, sticky="W", padx=10,pady=5)
-        credentialsPassLabel.grid(row=4, sticky="W", pady=5)
-        self.credentialsPassBox.grid(row=5, sticky="W", padx=10,pady=5)
-        credentialsShowPass.grid(row=5,column=1)
-
-        outputToFolderOption.grid(row=0, sticky="W")
-
-        # NEXT / BACK BUTTONS
-
-        backButton = ttk.Button(self, text="< Back <", command=self.backPage)
-        backButton.grid(row=20,column=1,sticky="se",padx=10,pady=10)
-
-        nextButton = ttk.Button(self, text="> Next >", command=self.nextPage)
-        nextButton.grid(row=20,column=2,sticky="se",padx=10,pady=10)
-
-    def show_password(self):
-        if self.showpass.get():
-            self.credentialsPassBox.config(show="")
-        else:
-            self.credentialsPassBox.config(show="*")
-
-    def outputToFolderCheck(self):
-
-        if self.outputToFolder.get():
-            self.outputPathLabel.grid(row=1, sticky="W", pady=10)
-            self.outputPathText.grid(row=2, sticky="W", padx=(10,0),pady=5)
-            self.directoryButton.grid(row=2, column = 1, sticky="E", padx=10)
-        else:
-            self.outputPathLabel.grid_remove()
-            self.outputPathText.grid_remove()
-            self.directoryButton.grid_remove()
-            self.outputPathText.delete(0.0, tk.END)
-
-    def pickFile(self):
-        self.deviceListBox.delete(0.0, tk.END)
-        devicelist = filedialog.askopenfilename()
-        self.deviceListBox.insert(0.0, devicelist)
-
-    def pickFolder(self):
-        self.outputPathText.delete(0.0, tk.END)
-        outputPath = filedialog.askdirectory()
-        self.outputPathText.insert(0.0, outputPath)
-
-
-    def backPage(self):
-        self.deviceListBox.delete(0.0, tk.END)
-        self.credentialsUserBox.delete(0, 'end')
-        self.credentialsPassBox.delete(0, 'end')
-        self.outputPathText.delete(0.0, tk.END)
-        self.controller.show_frame(HomePage)
-
-    def nextPage(self):
-        self.controller.deviceUser = self.credentialsUserBox.get()
-        self.controller.devicePass = self.credentialsPassBox.get()
-        self.controller.deviceList = self.deviceListBox.get('1.0', 'end').strip()
-        self.controller.outputPath = self.outputPathText.get('1.0', 'end').strip()
-
-        if self.controller.deviceList == "":
-            messagebox.showinfo(TITLE, "Please select a device list file!")
-        elif self.outputToFolder.get():
-            if self.controller.outputPath == "":
-                messagebox.showinfo(TITLE, "A folder must be chosen if 'log output' is checked!")
-            else:
-                self.controller.show_frame(CommandPage)
-        else:
-            self.controller.show_frame(CommandPage)
-
 
 if __name__ == "__main__":
     app = NetTools(None)
