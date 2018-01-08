@@ -10,7 +10,7 @@ import apic_run_commands as arc
 import ap_ports as ap
 
 TITLE = 'net-tools'
-MAINWINDOWSIZE = "850x700"
+MAINWINDOWSIZE = "925x700"
 
 LARGE_FONT = ("Verdana", 18)
 NORM_FONT = ("Verdana", 10)
