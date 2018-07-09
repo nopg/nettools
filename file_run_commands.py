@@ -97,20 +97,20 @@ def run_commands(fin,configpath,username,password,COMMANDS,outputBox=None,root=N
             
             if configpath == '':
                 if device_type == "cisco_nxos":
-                    output = net_connect.send_config_set(COMMANDS)
+                    output = net_connect.send_config_set(COMMANDS, delay_factor=2)
                     present_output(output)
                 else:
                     for command in COMMANDS:
                         present_output("\nRunning Command: {}\n\n".format(command))
                         
-                        output = net_connect.send_command(command)
+                        output = net_connect.send_command(command, delay_factor=2)
                         
                         present_output(output)
             else:
                 try:
                     with open(configpath + "/" + filename, 'w') as fout:
                         if device_type == "cisco_nxos":
-                            output = net_connect.send_config_set(COMMANDS)
+                            output = net_connect.send_config_set(COMMANDS, delay_factor=2)
                             present_output(output)
                             fout.write(output)
                         else:
@@ -118,14 +118,14 @@ def run_commands(fin,configpath,username,password,COMMANDS,outputBox=None,root=N
                                 present_output("\nRunning Command: {}\n\n".format(command))
                                 fout.write('\n\nRunning Command:\n' + command + '\n\n')
 
-                                output = net_connect.send_command(command)
+                                output = net_connect.send_command(command, delay_factor=2)
 
                                 present_output(output)
                                 fout.write(output)
                 except:
                     present_output("\nInvalid destination folder!\nContinuing....\n")
                     
-                    output = net_connect.send_config_set(COMMANDS)
+                    output = net_connect.send_config_set(COMMANDS, delay_factor=2)
                     
                     present_output(output)
 
