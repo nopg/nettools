@@ -65,11 +65,11 @@ def run_commands(username, password, switchfile, searchstring):
             #   FORMAT OUTPUT
                     cdpneighbors = format_fsm_output(re_table, fsm_results)
 
-                    print("-------------------------------")
-                    fout.write("-----------------------------")
+                    print("\n-------------------------------")
+                    fout.write("\n-----------------------------")
 
-                    print("Switch IP: {}".format(ip))
-                    fout.write("Switch IP: {}".format(ip))
+                    print("\nSwitch IP: {}".format(ip))
+                    fout.write("\nSwitch IP: {}".format(ip))
 
             #   SEARCH FOR DEVICES AND PRINT/SAVE OUTPUT #
                     found = 0
