@@ -761,7 +761,7 @@ class PopupWindow(object):
                                  self.outputBox, parent)
 
         elif self.controller.pageFrom == "FilePage":
-            frc.run_commands(self.controller.deviceList,
+            frc.main(self.controller.deviceList,
                             self.controller.outputPath,
                             self.controller.deviceUser,
                             self.controller.devicePass,
@@ -769,7 +769,7 @@ class PopupWindow(object):
                             self.outputBox, parent)
 
         elif self.controller.pageFrom == "ManualPage":
-            frc.run_commands(self.controller.tempDeviceFile.name,
+            frc.main(self.controller.tempDeviceFile.name,
                             self.controller.outputPath,
                             self.controller.deviceUser,
                             self.controller.devicePass,
