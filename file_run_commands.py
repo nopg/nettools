@@ -2,10 +2,17 @@ import sys
 import asyncio
 import yaml
 import getpass
+import logging
 import tkinter as tk
 from datetime import datetime
 
 import netdev
+
+PYTHONASYNCIODEBUG = 1
+
+#netdev_logger = netdev.logger
+#netdev_logger.setLevel(logging.INFO)
+#netdev_logger.addHandler(logging.StreamHandler())
 
 def ly(filename):
     try:
@@ -95,6 +102,7 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
                 present_output("\nInvalid destination folder!\nContinuing....\n")
                 return
 
+    # BUILD DEVICE LIST TO SEND INTO run_loop() #
     device_list = []
 
     for type in devices:
@@ -105,15 +113,15 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
                 device_type = 'cisco_nxos'             
             elif type == 'ASA':
                 device_type = 'cisco_asa'      
-            
-            device_list.append( {'username': username, 'password': password, 'device_type': device_type, 'host': ip} )
+            if ip:
+                device_list.append( {'username': username, 'password': password, 'device_type': device_type, 'host': ip} )
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_loop(device_list, configpath, COMMANDS))
 
-    present_output("\n\n\n\nComplete! Thank you for using nettools (needs a better name!).")
+    present_output("\n\n\n\nStats from last run:")
     
-    present_output("\n\n\n\nDevices timed out: ")
+    present_output("\n\n\nDevices timed out: ")
     [present_output("\n" + each) for each in timeouts]
 
     present_output("\n\nAuthentication failures:")
@@ -129,6 +137,8 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
     [present_output("\n{:15s} {:15s}".format(addr,fname)) for addr,fname in successes]
         
     present_output("\n\nTime elapsed: {}\n\n".format(datetime.now() - start_time))
+
+    present_output("\n\nComplete! Thank you for using nettools (needs a better name!).\n")
 
     return
 
