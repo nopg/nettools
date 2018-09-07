@@ -11,4 +11,4 @@ ASA:
 TELNET:
 # EXAMPLE:
 # - [3.3.3.3, telnetpass, enablepass]
-  - [5.5.5.5, mypass, pass2]
+#  - [5.5.5.5, mypass, pass2]

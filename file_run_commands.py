@@ -41,9 +41,7 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
             root.update()
             print(msg, end='', flush=True)
 
-    async def run_loop(device_list, configpath, COMMANDS):
-
-        tasks = [connect_and_run(device, configpath, COMMANDS) for device in device_list]
+    async def run_loop(tasks):
         await asyncio.wait(tasks)
 
     async def connect_and_run(device, configpath, COMMANDS):
@@ -106,18 +104,20 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
     device_list = []
 
     for type in devices:
-        for ip in devices[type]:
-            if type == 'IOS':
-                device_type = 'cisco_ios'
-            elif type == 'NX-OS':
-                device_type = 'cisco_nxos'             
-            elif type == 'ASA':
-                device_type = 'cisco_asa'      
-            if ip:
-                device_list.append( {'username': username, 'password': password, 'device_type': device_type, 'host': ip} )
+        if devices[type]:
+            for ip in devices[type]:
+                if type == 'IOS':
+                    device_type = 'cisco_ios'
+                elif type == 'NX-OS':
+                    device_type = 'cisco_nxos'             
+                elif type == 'ASA':
+                    device_type = 'cisco_asa'      
+                if ip:
+                    device_list.append( {'username': username, 'password': password, 'device_type': device_type, 'host': ip} )
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run_loop(device_list, configpath, COMMANDS))
+    tasks = [connect_and_run(device, configpath, COMMANDS) for device in device_list]
+    loop.run_until_complete(run_loop(tasks))
 
     present_output("\n\n\n\nStats from last run:")
     
