@@ -41,9 +41,6 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
             root.update()
             print(msg, end='', flush=True)
 
-    async def run_loop(tasks):
-        await asyncio.wait(tasks)
-
     async def connect_and_run(device, configpath, COMMANDS):
 
         present_output("\nConnecting to {}.....\n".format(device['host']))
@@ -115,9 +112,10 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
                 if ip:
                     device_list.append( {'username': username, 'password': password, 'device_type': device_type, 'host': ip} )
 
+    # RUN LOOP #
     loop = asyncio.get_event_loop()
     tasks = [connect_and_run(device, configpath, COMMANDS) for device in device_list]
-    loop.run_until_complete(run_loop(tasks))
+    loop.run_until_complete(asyncio.wait(tasks))
 
     present_output("\n\n\n\nStats from last run:")
     
@@ -138,7 +136,7 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
         
     present_output("\n\nTime elapsed: {}\n\n".format(datetime.now() - start_time))
 
-    present_output("\n\nComplete! Thank you for using nettools (needs a better name!).\n")
+    present_output("\n\nComplete! Thank you for using nettools (needs a better name!).\n\n")
 
     return
 
