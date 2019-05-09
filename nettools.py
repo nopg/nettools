@@ -914,8 +914,6 @@ class PopupWindow(object):
                             self.controller.searchString)
 
         elif self.controller.pageFrom == "UsedPortsPage":
-            messagebox.showinfo(TITLE, "This feature is under construction\nPlease check the CLI for output.\n"
-                                       "IOS switches supported only.")
             fup.main(self.controller.deviceList,
                             self.controller.outputPath,
                             self.controller.deviceUser,
