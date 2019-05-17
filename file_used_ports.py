@@ -1,4 +1,4 @@
-# Catalyst IOS based switches only. No support for NX-OS, or Routers.
+# Catalyst switches only. No support for Routers or Firewalls.
 import sys
 import os
 import asyncio
