@@ -1,6 +1,6 @@
 Value PORT ((Eth\d+/\d+)|(Eth\d+/\d+/\d+))
 Value DESCRIPTION (\S+((\s+\S+)+)?|\S+)
-Value STATUS (err-disabled|disabled|connected|notconnec|notconnect|inactive|sfpAbsent)
+Value STATUS (err-disabled|disabled|connected|notconnec|notconnect|inactive|sfpAbsent|xcvrAbsen)
 Value VLAN (\w+|\d+?)
 Value DUPLEX (full|auto|half)
 Value SPEED (.*?)

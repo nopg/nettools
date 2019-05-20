@@ -154,7 +154,7 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
                 errdisabled_ports_list.append(port)
             elif 'notconnec' in port['STATUS']:
                 notconnect_ports_list.append(port)
-            elif port['STATUS'] == 'inactive' or port['STATUS'] == 'sfpAbsent':
+            elif port['STATUS'] == 'inactive' or port['STATUS'] == 'sfpAbsent' or 'xcvrAbsen' in port['STATUS']:
                 inactive_ports_list.append(port)
 
         for port in connected_ports_list:   
