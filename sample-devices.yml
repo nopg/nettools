@@ -8,7 +8,7 @@ NX-OS:
   - 1.1.1.1
 ASA:
   - 2.2.2.2
-TELNET:
+#ASA-ENABLE:
 # EXAMPLE:
 # - [3.3.3.3, telnetpass, enablepass]
-#  - [5.5.5.5, mypass, pass2]
+# - [4.4.4.4, pass1, pass2]

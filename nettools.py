@@ -412,7 +412,7 @@ class ManualPage(tk.Frame):
         asaLabel = ttk.Label(testFrame, text="ASA Devices:")
         self.asaText = tkst.ScrolledText(testFrame, width=40, height=10, borderwidth=2, relief=tk.SUNKEN)
 
-        telnetLabel = ttk.Label(testFrame, text="Telnet Devices:")
+        telnetLabel = ttk.Label(testFrame, text="ASA+ENABLE Devices:")
         self.telnetText = tkst.ScrolledText(testFrame, width=40, height=10, borderwidth=2, relief=tk.SUNKEN)
 
         testFrame.grid(row=0,column=0)
@@ -538,7 +538,7 @@ class ManualPage(tk.Frame):
                 for device in asaDevices:
                     self.controller.tempDeviceFile.write(" - " + device + '\n')
             if telnetDevices != ['']:
-                self.controller.tempDeviceFile.write("TELNET:\n")
+                self.controller.tempDeviceFile.write("ASA-ENABLE:\n")
                 for device in telnetDevices:
                     self.controller.tempDeviceFile.write(" - " + device + '\n')
 

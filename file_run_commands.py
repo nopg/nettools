@@ -103,14 +103,20 @@ def main(fin,configpath,username,password,COMMANDS,outputBox=None,root=None):
     for type in devices:
         if devices[type]:
             for ip in devices[type]:
+                secret = ''
                 if type == 'IOS':
                     device_type = 'cisco_ios'
                 elif type == 'NX-OS':
                     device_type = 'cisco_nxos'             
                 elif type == 'ASA':
-                    device_type = 'cisco_asa'      
+                    device_type = 'cisco_asa'  
+                elif type == 'ASA-ENABLE':
+                    device_type = 'cisco_asa'
+                    password = ip[1]
+                    secret = ip[2]
+                    ip = ip[0]
                 if ip:
-                    device_list.append( {'username': username, 'password': password, 'device_type': device_type, 'host': ip} )
+                    device_list.append( {'username': username, 'password': password, 'secret': secret, 'device_type': device_type, 'host': ip} )
 
     # RUN LOOP #
     loop = asyncio.get_event_loop()
