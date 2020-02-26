@@ -58,13 +58,17 @@ def build_csv(output, filename):
     filename = filename + ".csv"
     print(f"Building {filename} ...")
 
-    headers = list(output[0].keys())
+    # Grab keys from all devices, don't allow duplicates
+    headers = []
+    for item in output:
+        for key in item.keys():
+            if key not in headers:
+                headers.append(key)
     fout = open(filename, 'w')
     writer = csv.DictWriter(fout, fieldnames=headers, lineterminator='\n')
     writer.writeheader()
     writer.writerows(output)
     fout.close()
-
 
 def main(fin,configpath,username,password,outputBox=None,root=None):
 
@@ -114,7 +118,8 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
             # Error grabbing info, mark everything unknown and record
             used_ports = {'Device Name': hostname, 'Model': "unknown", 'IP Address': ip, 'Total Ports': "unknown", 'Connected Ports': "unknown",
                      'Disabled Ports': "unknown", 'Err-Disabled Ports': "unknown", "Not connected Ports": "unknown", "Inactive Ports": "unknown",
-                      "100M Port Count": "unknown", "1Gig Port Count": "unknown", "TenGig Port Count": "unknown", "25G Ports": "unknown", "40G Ports": "unknown", "100G Ports": "unknown"}
+                      "100M Port Count": "unknown", "1Gig Port Count": "unknown", "TenGig Port Count": "unknown", "25G Ports": "unknown", 
+                      "40G Ports": "unknown", "100G Ports": "unknown"}
             output_csv.append(used_ports)
             return f"Error grabbing information for (probably unsupported) device: {ip}, skipping interface check.\n"
         else:
@@ -128,7 +133,8 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
             # Create CSV Fields with unknown values
             used_ports = {'Device Name': hostname, 'Model': model, 'IP Address': ip, 'Total Ports': "unknown", 'Connected Ports': "unknown",
                         'Disabled Ports': "unknown", 'Err-Disabled Ports': "unknown", "Not connected Ports": "unknown", "Inactive Ports": "unknown",
-                        "100M Port Count": "unknown", "1Gig Port Count": "unknown", "TenGig Port Count": "unknown", "25G Ports": "unknown", "40G Ports": "unknown", "100G Ports": "unknown"}
+                        "100M Port Count": "unknown", "1Gig Port Count": "unknown", "TenGig Port Count": "unknown", "25G Ports": "unknown", 
+                        "40G Ports": "unknown", "100G Ports": "unknown"}
             output_csv.append(used_ports)
             return f"Unable to find interfaces for (probably unsupported) device {hostname}\n"
 
@@ -143,6 +149,7 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
         t25gig_ports_list = []
         fortygig_ports_list = []
         hungig_ports_list = []
+        sfp_types_dict = {'SFP-Types': "==="}
 
         # Create port counts
         for port in int_status_formatted:
@@ -156,7 +163,19 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
                 notconnect_ports_list.append(port)
             elif port['STATUS'] == 'inactive' or port['STATUS'] == 'sfpAbsent' or 'xcvrAbsen' in port['STATUS']:
                 inactive_ports_list.append(port)
+        
+        # Find all SFP/Port Types
+        for port in int_status_formatted:
 
+            sfp_type = port['TYPE']
+
+            #if 'sfp' in sfp_type.lower():
+            if sfp_type in sfp_types_dict:
+                sfp_types_dict[sfp_type] += 1
+            else:
+                sfp_types_dict[sfp_type] = 1
+
+        # Determine existing speeds
         for port in connected_ports_list:   
             if "1000" in port['SPEED']:
                 gig_ports_list.append(port) 
@@ -169,6 +188,7 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
             elif "100" in port['SPEED']:
                 fasteth_ports_list.append(port)
 
+        # Get the Count
         connected_ports = len(connected_ports_list)
         disabled_ports = len(disabled_ports_list)
         errdisabled_ports = len(errdisabled_ports_list)
@@ -188,8 +208,10 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
                     "40G Ports": fortygig_ports, "100G Ports": hungig_ports}
 
         build_csv(int_status_formatted, configpath + "/" + used_ports["Device Name"] + '-' + str(datetime.now().microsecond) + '.log')
-        output_csv.append(used_ports)
 
+        # Combine dicts & output_csv for building later
+        used_ports.update(sfp_types_dict)
+        output_csv.append(used_ports)
 
         return f"Finished with host: {ip}\n"
 
