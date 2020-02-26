@@ -149,7 +149,7 @@ def main(fin,configpath,username,password,outputBox=None,root=None):
         t25gig_ports_list = []
         fortygig_ports_list = []
         hungig_ports_list = []
-        sfp_types_dict = {'SFP-Types': "==="}
+        sfp_types_dict = {'SFP-Types': "SFP-Types:"}
 
         # Create port counts
         for port in int_status_formatted:
