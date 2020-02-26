@@ -17,7 +17,7 @@ DEBUG = 1
 def ly(filename):
     try:
         with open(filename) as _:
-            return yaml.load(_)
+            return yaml.load(_, Loader=yaml.SafeLoader)
     except:
         if not DEBUG:
             print("Invalid device file!")
@@ -310,7 +310,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) != 4:
         print("\nplease provide the following arguments:")
-        print("\tpython3 file_run_commands.py <device-file.yml> <output folder path> <username>\n\n")
+        print("\tpython3 file_used_ports.py <device-file.yml> <output folder path> <username>\n\n")
         sys.exit(0)
 
     device_file = sys.argv[1]

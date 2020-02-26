@@ -17,7 +17,7 @@ PYTHONASYNCIODEBUG = 1
 def ly(filename):
     try:
         with open(filename) as _:
-            return yaml.load(_)
+            return yaml.load(_, Loader=yaml.SafeLoader)
     except:
         print("Invalid device file!")
         sys.exit(0)

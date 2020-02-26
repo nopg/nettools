@@ -7,7 +7,7 @@ from netmiko.ssh_exception import *
 
 def ly(filename):
     with open(filename) as _:
-        return yaml.load(_)
+        return yaml.load(_, Loader=yaml.SafeLoader)
 
 def format_fsm_output(re_table, fsm_results):
     """
