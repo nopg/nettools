@@ -1,5 +1,3 @@
-# README IS A WORK IN PROGRESS WILL BE UPDATED SOON (5/20/19)
-
 # NetTools
 GUI front-end to a few modules I've created. 
 
